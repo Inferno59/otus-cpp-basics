@@ -1,23 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(03.homework)
+project(choose_number)
 
 add_executable(
-	check_value
-	check_value.cpp
-)
-
-add_executable(
-	random_value
-	random_value.cpp
-)
-
-add_executable(
-	high_scores
-	high_scores.cpp
-)
-
-add_executable(
-	argument
-	argument.cpp
+	game_choose_number
+	main.cpp
+	choose_number.cpp
 )

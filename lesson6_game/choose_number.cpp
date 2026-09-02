@@ -10,7 +10,7 @@ ChooseNumber::ChooseNumber()
   , scores_table_() {}
 
 int ChooseNumber::GetRandomValue() const {
-  std::srand(std::time(nullptr)); // use current time as seed for random generator  
+  std::srand(std::time(nullptr));
   return std::rand() % max_value_;
 }
 
@@ -52,9 +52,6 @@ bool ChooseNumber::ShowHighScoresTable() {
 }
 
 bool ChooseNumber::AddToTable() {
-	// Write new high score to the records table
-  // We should open the output file in the append mode - we don't want
-  // to erase previous results.
   std::ofstream out_file{kHighScoresFilename.data(), std::ios_base::app};
   if (!out_file.is_open()) {
     std::cout << "Failed to open file for write: " << kHighScoresFilename << "!" << std::endl;

@@ -9,6 +9,7 @@
 class ChooseNumber final {
   public:
     explicit ChooseNumber();
+    ~ChooseNumber() = default;
 
     void Process();
     void SetMaxValue(const int value);
@@ -16,6 +17,12 @@ class ChooseNumber final {
     bool ShowTable();
     
   private:
+    ChooseNumber(const ChooseNumber&) = delete;
+    ChooseNumber(ChooseNumber&&) = delete;
+
+    ChooseNumber& operator=(const ChooseNumber&) = delete;
+    ChooseNumber& operator=(ChooseNumber&&) = delete;
+
     static constexpr std::string_view kHighScoresFilename = "high_scores.txt";
     static constexpr int kMaxValue = 100;
 

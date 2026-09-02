@@ -3,6 +3,7 @@
 int main(int argc, char **argv) {
   ChooseNumber game{};
 
+  // В расчет берем только первый параметр
   bool just_show_table = false;
   if (argc >= 2) {
     if (std::string(argv[1]) == "-max") {
@@ -31,6 +32,8 @@ int main(int argc, char **argv) {
           std::cerr << "Bad level " << level << " should be in range 1-3. Max value will be applied as default (100)" << std::endl;
       }
     }
+
+    // Выводим оставшиеся входные параметры
     if (argc > 2) {
       std::cout << "You entered a lot of parameters, that parameters will be skipped: ";
       for (size_t i = 3; i < argc; ++i)

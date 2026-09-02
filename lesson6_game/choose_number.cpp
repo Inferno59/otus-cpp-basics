@@ -31,7 +31,7 @@ void ChooseNumber::CheckUserGuess() {
     ++attempts_count_;
 
     if (current_value < target_value_) {
-      std::cout <<" less than" << std::endl;
+      std::cout << "less than" << std::endl;
     }
     else if (current_value > target_value_) {
       std::cout << "greater than " << std::endl;

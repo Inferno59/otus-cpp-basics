@@ -34,8 +34,8 @@ int main(int argc, char **argv) {
     }
 
     // Выводим оставшиеся входные параметры
-    if (argc > 2) {
-      std::cout << "You entered a lot of parameters, that parameters will be skipped: ";
+    if (argc > 3) {
+      std::cout << "You entered a lot of parameters, that parameters will be skipped: " << argc << " ";
       for (size_t i = 3; i < argc; ++i)
         std::cout << argv[i] << " ";
       std::cout << std::endl;

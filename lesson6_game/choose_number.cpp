@@ -46,6 +46,8 @@ void ChooseNumber::CheckUserGuess() {
 bool ChooseNumber::ShowHighScoresTable() {
   if (!AddToTable())
     return false;
+
+  return true;
 }
 
 bool ChooseNumber::AddToTable() {

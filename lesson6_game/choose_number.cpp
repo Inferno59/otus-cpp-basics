@@ -46,9 +46,6 @@ void ChooseNumber::CheckUserGuess() {
 bool ChooseNumber::ShowHighScoresTable() {
   if (!AddToTable())
     return false;
-
-  std::cout << "" << std::endl;
-  return ShowTable();
 }
 
 bool ChooseNumber::AddToTable() {

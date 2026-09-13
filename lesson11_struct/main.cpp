@@ -11,16 +11,11 @@ int main(int argc, char* argv[]) {
     }
     try {
         World w(argv[1]);
-        /**
-         * Код ниже запускает выполнение приложения. Для
-         * выполнения задания нет необходимости изучать
-         * или менять содержимое Application. Для начала
-         * лучше сфокусироваться на Ball.hpp, Ball.cpp и
-         * World.cpp
-         */
+
         Application app("physics");
         app.run(w);
     } catch (std::exception& ex) {
+        std::cout << "Get exception ============================" << std::endl;
         std::cerr << ex.what() << std::endl;
         return 2;
     }

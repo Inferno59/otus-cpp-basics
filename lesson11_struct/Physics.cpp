@@ -26,10 +26,11 @@ void Physics::collideBalls(std::vector<Ball>& balls) const {
             const double distanceBetweenCenters2 =
                 distance2(a->getCenter(), b->getCenter());
             const double collisionDistance = a->getRadius() + b->getRadius();
-            const double collisionDistance2 =
-                collisionDistance * collisionDistance;
+            const double collisionDistance2 = collisionDistance * collisionDistance;
 
-            if (distanceBetweenCenters2 < collisionDistance2) {
+            // Столкновение, если хотя бы один шар "твёрдый"
+            if ((a->isCollibadle() || b->isCollibadle()) &&
+                (distanceBetweenCenters2 < collisionDistance2)) {
                 processCollision(*a, *b, distanceBetweenCenters2);
             }
         }
@@ -38,22 +39,36 @@ void Physics::collideBalls(std::vector<Ball>& balls) const {
 
 void Physics::collideWithBox(std::vector<Ball>& balls) const {
     for (Ball& ball : balls) {
-        const Point p = ball.getCenter();
+        Point p = ball.getCenter();
         const double r = ball.getRadius();
-        // определяет, находится ли v в диапазоне (lo, hi) (не включая границы)
-        auto isOutOfRange = [](double v, double lo, double hi) {
-            return v < lo || v > hi;
-        };
+        Point v = ball.getVelocity().vector();
 
-        if (isOutOfRange(p.x, topLeft.x + r, bottomRight.x - r)) {
-            Point vector = ball.getVelocity().vector();
-            vector.x = -vector.x;
-            ball.setVelocity(vector);
-        } else if (isOutOfRange(p.y, topLeft.y + r, bottomRight.y - r)) {
-            Point vector = ball.getVelocity().vector();
-            vector.y = -vector.y;
-            ball.setVelocity(vector);
+        bool wasX = false, wasY = false;
+
+        if (p.x - r < topLeft.x) {
+            p.x = topLeft.x + r;
+            wasX = true;
+        } else if (p.x + r > bottomRight.x) {
+            p.x = bottomRight.x - r;
+            wasX = true;
         }
+
+        if (p.y - r < topLeft.y) {
+            p.y = topLeft.y + r;
+            wasY = true;
+        } else if (p.y + r > bottomRight.y) {
+            p.y = bottomRight.y - r;
+            wasY = true;
+        }
+
+        // Только если шар сталкиваемый — меняем скорость
+        if (ball.isCollibadle()) {
+            if (wasX) v.x = -v.x;
+            if (wasY) v.y = -v.y;
+        }
+
+        ball.setCenter(p);
+        ball.setVelocity(v);
     }
 }
 
@@ -80,6 +95,6 @@ void Physics::processCollision(Ball& a, Ball& b,
         2 * (dot(aV, normal) - dot(bV, normal)) / (a.getMass() + b.getMass());
 
     // задаем новые скорости мячей после столкновения
-    a.setVelocity(Velocity(aV - normal * p * a.getMass()));
-    b.setVelocity(Velocity(bV + normal * p * b.getMass()));
+    a.setVelocity(Velocity(aV - normal * p * b.getMass()));
+    b.setVelocity(Velocity(bV + normal * p * a.getMass()));
 }

@@ -1,7 +1,8 @@
 #include "World.hpp"
 #include "Painter.hpp"
 #include <fstream>
-
+#include <stdexcept>
+#include <exception>
 // Длительность одного тика симуляции.
 // Подробнее см. update()
 // Изменять не следует
@@ -11,7 +12,14 @@ static constexpr double timePerTick = 0.001;
  * Конструирует объект мира для симуляции
  * @param worldFilePath путь к файлу модели мира
  */
-World::World(const std::string& worldFilePath) {
+World::World(const std::string& worldFilePath) 
+    : topLeft{} 
+    , bottomRight{} 
+    , physics{} 
+    , balls_{} 
+    , restTime{} {
+    if (worldFilePath.empty())
+        throw std::runtime_error("World path is empty");
 
     std::ifstream stream(worldFilePath);
     /**
@@ -32,33 +40,17 @@ World::World(const std::string& worldFilePath) {
      * как и (red, green, blue). Опять же, можно упростить
      * этот код, научившись читать сразу Point, Color...
      */
-    double x;
-    double y;
-    double vx;
-    double vy;
-    double radius;
-
-    double red;
-    double green;
-    double blue;
-
-    bool isCollidable;
+    Ball tmp_ball;
 
     // Здесь не хватает обработки ошибок, но на текущем
     // уровне прохождения курса нас это устраивает
     while (stream.peek(), stream.good()) {
         // Читаем координаты центра шара (x, y) и вектор
         // его скорости (vx, vy)
-        stream >> x >> y >> vx >> vy;
+        // stream >> x >> y >> vx >> vy;
+        // stream >> x >> y >> vx >> vy;
         // Читаем три составляющие цвета шара
-        stream >> red >> green >> blue;
-        // Читаем радиус шара
-        stream >> radius;
-        // Читаем свойство шара isCollidable, которое
-        // указывает, требуется ли обрабатывать пересечение
-        // шаров как столкновение. Если true - требуется.
-        // В базовой части задания этот параметр
-        stream >> std::boolalpha >> isCollidable;
+        stream >> tmp_ball;
 
         // TODO: место для доработки.
         // Здесь не хватает самого главного - создания
@@ -68,8 +60,11 @@ World::World(const std::string& worldFilePath) {
         // После того как мы каким-то образом
         // сконструируем объект Ball ball;
         // добавьте его в конец контейнера вызовом
-        // balls.push_back(ball);
+        balls_.push_back(std::move(tmp_ball));
+        //balls_.emplace_back(std::move(tmp_ball));
     }
+
+    std::cout << "End program" << std::endl;
 }
 
 /// @brief Отображает состояние мира
@@ -79,13 +74,14 @@ void World::show(Painter& painter) const {
     painter.draw(topLeft, bottomRight, Color(1, 1, 1));
 
     // Вызываем отрисовку каждого шара
-    for (const Ball& ball : balls) {
+    for (const Ball& ball : balls_) {
         ball.draw(painter);
     }
 }
 
 /// @brief Обновляет состояние мира
 void World::update(double time) {
+   // std::cout << "update time: " << time << std::endl;
     /**
      * В реальном мире время течет непрерывно. Однако
      * компьютеры дискретны по своей природе. Поэтому
@@ -106,5 +102,5 @@ void World::update(double time) {
     const auto ticks = static_cast<size_t>(std::floor(time / timePerTick));
     restTime = time - double(ticks) * timePerTick;
 
-    physics.update(balls, ticks);
+    physics.update(balls_, ticks);
 }

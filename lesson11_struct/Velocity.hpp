@@ -28,3 +28,12 @@ class Velocity {
   private:
     Point vec;
 };
+
+inline std::istream& operator>>(std::istream& os, Velocity& velocity) {
+    Point buf_point;
+    os >> buf_point.x >> buf_point.y;
+    velocity.setVector(buf_point);
+
+    std::cout << "Velocity point get x " << buf_point.x << " y: " << buf_point.y << std::endl;
+    return os;
+}

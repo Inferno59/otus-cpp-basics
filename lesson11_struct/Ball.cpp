@@ -1,12 +1,18 @@
 #include "Ball.hpp"
 #include <cmath>
 
+Ball::Ball(Point center, Velocity velocity, Color color, double radius)
+    : center_{center}
+    , velocity_{velocity}
+    , color_{color}
+    , radius_{radius} {}
 /**
  * Задает скорость объекта
  * @param velocity новое значение скорости
  */
 void Ball::setVelocity(const Velocity& velocity) {
     // TODO: место для доработки
+    velocity_ = velocity;
 }
 
 /**
@@ -14,7 +20,7 @@ void Ball::setVelocity(const Velocity& velocity) {
  */
 Velocity Ball::getVelocity() const {
     // TODO: место для доработки
-    return {};
+    return velocity_;
 }
 
 /**
@@ -27,6 +33,7 @@ Velocity Ball::getVelocity() const {
  */
 void Ball::draw(Painter& painter) const {
     // TODO: место для доработки
+    painter.draw(center_, radius_, color_);
 }
 
 /**
@@ -35,6 +42,7 @@ void Ball::draw(Painter& painter) const {
  */
 void Ball::setCenter(const Point& center) {
     // TODO: место для доработки
+    center_ = center;
 }
 
 /**
@@ -42,7 +50,7 @@ void Ball::setCenter(const Point& center) {
  */
 Point Ball::getCenter() const {
     // TODO: место для доработки
-    return {};
+    return center_;
 }
 
 /**
@@ -52,7 +60,7 @@ Point Ball::getCenter() const {
  */
 double Ball::getRadius() const {
     // TODO: место для доработки
-    return {};
+    return radius_;
 }
 
 /**
@@ -64,5 +72,10 @@ double Ball::getRadius() const {
  */
 double Ball::getMass() const {
     // TODO: место для доработки
-    return {};
+    double volume = 3.14 * std::pow(radius_, 3) * 4. / 3.;
+    return isCollidable_ ? 0 : volume;
+}
+
+bool Ball::isCollibadle() const {
+    return isCollidable_;
 }

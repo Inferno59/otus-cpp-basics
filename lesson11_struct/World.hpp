@@ -19,7 +19,7 @@ class World {
     // Объект физического движка
     Physics physics;
     // Контейнер с шарами
-    std::vector<Ball> balls;
+    std::vector<Ball> balls_;
     // Длина отрезка времени, который не был
     // учтен при прошлой симуляции. См. реализацию update
     double restTime = 0.;

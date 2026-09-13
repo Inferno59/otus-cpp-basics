@@ -13,6 +13,8 @@ public:
     void draw(Painter& painter) const;
     void update(double tick);
 private:
+    inline static constexpr int kMaxParticlesCnt = 4;
+
     // Простой генератор случайных чисел
     static double randomDouble(double lo, double hi) {
         static std::mt19937 rng{std::random_device{}()};

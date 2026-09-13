@@ -10,10 +10,7 @@ Dust::Dust(const Point& start_point, const Point& normal, double radius, double 
     , impact_speed_{impact_speed}
     , particles_{} {
 
-    // Количество брызг зависит от силы удара
-    int count = static_cast<int>(std::clamp(impact_speed_ * 0.5, 1.0, 4.0));
-
-    for (int i = 0; i < count; ++i) {
+    for (int i = 0; i < kMaxParticlesCnt; ++i) {
         Particle p;
         p.pos      = start_point;
         p.color    = color_;

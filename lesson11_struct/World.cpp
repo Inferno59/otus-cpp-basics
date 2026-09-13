@@ -34,37 +34,12 @@ World::World(const std::string& worldFilePath)
     stream >> topLeft.x >> topLeft.y >> bottomRight.x >> bottomRight.y;
     physics.setWorldBox(topLeft, bottomRight);
 
-    /**
-     * TODO: хорошее место для улучшения.
-     * (x, y) и (vx, vy) - составные части объекта, также
-     * как и (red, green, blue). Опять же, можно упростить
-     * этот код, научившись читать сразу Point, Color...
-     */
     Ball tmp_ball;
 
-    // Здесь не хватает обработки ошибок, но на текущем
-    // уровне прохождения курса нас это устраивает
     while (stream.peek(), stream.good()) {
-        // Читаем координаты центра шара (x, y) и вектор
-        // его скорости (vx, vy)
-        // stream >> x >> y >> vx >> vy;
-        // stream >> x >> y >> vx >> vy;
-        // Читаем три составляющие цвета шара
         stream >> tmp_ball;
-
-        // TODO: место для доработки.
-        // Здесь не хватает самого главного - создания
-        // объекта класса Ball со свойствами, прочитанными
-        // выше, и его помещения в контейнер balls
-
-        // После того как мы каким-то образом
-        // сконструируем объект Ball ball;
-        // добавьте его в конец контейнера вызовом
         balls_.push_back(std::move(tmp_ball));
-        //balls_.emplace_back(std::move(tmp_ball));
     }
-
-    std::cout << "End program" << std::endl;
 }
 
 /// @brief Отображает состояние мира
@@ -77,6 +52,11 @@ void World::show(Painter& painter) const {
     for (const Ball& ball : balls_) {
         ball.draw(painter);
     }
+
+    // Вызываем отрисовку каждого пылинки
+    for (const Dust& dust : dusts_) {
+        dust.draw(painter);
+    }    
 }
 
 /// @brief Обновляет состояние мира
@@ -102,5 +82,5 @@ void World::update(double time) {
     const auto ticks = static_cast<size_t>(std::floor(time / timePerTick));
     restTime = time - double(ticks) * timePerTick;
 
-    physics.update(balls_, ticks);
+    physics.update(balls_, dusts_, ticks);
 }

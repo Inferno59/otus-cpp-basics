@@ -72,7 +72,7 @@ double Ball::getRadius() const {
  */
 double Ball::getMass() const {
     // TODO: место для доработки
-    double volume = 3.14 * std::pow(radius_, 3) * 4. / 3.;
+    double volume = M_PI * std::pow(radius_, 3) * 4. / 3.;
     return volume;
 }
 

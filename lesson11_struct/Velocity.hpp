@@ -25,6 +25,10 @@ class Velocity {
         return vec;
     }
 
+    inline friend Velocity operator/(const Velocity& p, double scalar) {
+        return {p.vec / scalar};
+    }
+    
   private:
     Point vec;
 };

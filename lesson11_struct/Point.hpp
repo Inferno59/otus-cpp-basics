@@ -33,6 +33,5 @@ inline double distance2(const Point& lhs, const Point& rhs) {
 
 inline std::istream& operator>>(std::istream& os, Point& point) {
     os >> point.x >> point.y;
-    std::cout << "Point get x " << point.x << " y: " << point.y << std::endl;
     return os;
 }

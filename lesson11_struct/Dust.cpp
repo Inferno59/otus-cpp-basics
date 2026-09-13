@@ -1,6 +1,6 @@
-#include "Dust.hpp"
 #include <cmath>
 #include <algorithm>
+#include "Dust.hpp"
 
 Dust::Dust(const Point& start_point, const Point& normal, double radius, double impact_speed) 
     : start_point_{start_point}
@@ -55,8 +55,8 @@ void Dust::draw(Painter& painter) const {
     for (const auto& p : particles_) {
         if (!p.alive()) continue;
 
-        // Затухание цвета к прозрачному (затемняем)
-        double t = 1.0 - p.age / p.lifetime;  // 1 → 0
+        // Затухание цвета к прозрачному
+        double t = 1.0 - p.age / p.lifetime;
         Color faded{
             color_.red()   * t,
             color_.green() * t,

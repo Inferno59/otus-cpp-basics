@@ -25,14 +25,10 @@ void Application::run(World& world) {
 }
 
 void Application::processEvents() {
-    // 4. SFML 3.0 uses std::optional for the event loop
     while (const auto event = window.pollEvent()) {
-        
-        // 5. Use type-safe event checking with is<>()
         if (event->is<sf::Event::Closed>()) {
             window.close();
         } 
-        // 6. Use getIf<>() to extract event data safely
         else if (const auto* mouseWheelScroll = event->getIf<sf::Event::MouseWheelScrolled>()) {
             view.onZoom(mouseWheelScroll->delta);
         }

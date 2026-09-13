@@ -22,16 +22,8 @@ World::World(const std::string& worldFilePath)
         throw std::runtime_error("World path is empty");
 
     std::ifstream stream(worldFilePath);
-    /**
-     * TODO: хорошее место для улучшения.
-     * Чтение границ мира из модели
-     * Обратите внимание, что здесь и далее мы многократно
-     * читаем в объект типа Point, последовательно
-     * заполняя координаты x и у. Если что-то делаем
-     * многократно - хорошо бы вынести это в функцию
-     * и не дублировать код...
-     */
-    stream >> topLeft.x >> topLeft.y >> bottomRight.x >> bottomRight.y;
+
+    stream >> topLeft >> bottomRight;
     physics.setWorldBox(topLeft, bottomRight);
 
     Ball tmp_ball;
@@ -44,8 +36,7 @@ World::World(const std::string& worldFilePath)
 
 /// @brief Отображает состояние мира
 void World::show(Painter& painter) const {
-    // Рисуем белый прямоугольник, отображающий границу
-    // мира
+    // Рисуем белый прямоугольник, отображающий границу мира
     painter.draw(topLeft, bottomRight, Color(1, 1, 1));
 
     // Вызываем отрисовку каждого шара
@@ -53,7 +44,7 @@ void World::show(Painter& painter) const {
         ball.draw(painter);
     }
 
-    // Вызываем отрисовку каждого пылинки
+    // Вызываем отрисовку каждой пылинки
     for (const Dust& dust : dusts_) {
         dust.draw(painter);
     }    
@@ -61,7 +52,6 @@ void World::show(Painter& painter) const {
 
 /// @brief Обновляет состояние мира
 void World::update(double time) {
-   // std::cout << "update time: " << time << std::endl;
     /**
      * В реальном мире время течет непрерывно. Однако
      * компьютеры дискретны по своей природе. Поэтому

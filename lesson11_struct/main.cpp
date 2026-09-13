@@ -15,7 +15,6 @@ int main(int argc, char* argv[]) {
         Application app("physics");
         app.run(w);
     } catch (std::exception& ex) {
-        std::cout << "Get exception ============================" << std::endl;
         std::cerr << ex.what() << std::endl;
         return 2;
     }

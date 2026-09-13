@@ -41,7 +41,7 @@ void PainterImpl::draw(const Point& topLeft, const Point& bottomRight,
 
 sf::Color PainterImpl::toSFMLColor(const Color& color) const {
     auto toColorComponent = [](double value) {
-        return sf::Uint8(std::clamp(value, 0., 1.) * 255);
+        return std::uint8_t(std::clamp(value, 0., 1.) * 255);
     };
 
     return sf::Color{

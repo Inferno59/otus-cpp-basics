@@ -1,14 +1,16 @@
 #include "Application.hpp"
 #include "../World.hpp"
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/VideoMode.hpp>
 #include <chrono>
 #include <map>
 
 Application::Application(const char* name)
-    : window{{1280u, 960u},
+    : window{sf::VideoMode{{1280u, 960u}},
              name,
              sf::Style::Titlebar | sf::Style::Close,
-             sf::ContextSettings(0, 0, 4)},
+             sf::State::Windowed,
+             sf::ContextSettings{0, 0, 4}},
       view({0., 0.}, 1280, 960, 0.2) {}
 
 void Application::run(World& world) {
@@ -23,11 +25,12 @@ void Application::run(World& world) {
 }
 
 void Application::processEvents() {
-    for (sf::Event event{}; window.pollEvent(event); /**/) {
-        if (event.type == sf::Event::EventType::Closed) {
+    while (const auto event = window.pollEvent()) {
+        if (event->is<sf::Event::Closed>()) {
             window.close();
-        } else if (event.type == sf::Event::EventType::MouseWheelScrolled) {
-            view.onZoom(event.mouseWheelScroll.delta);
+        } 
+        else if (const auto* mouseWheelScroll = event->getIf<sf::Event::MouseWheelScrolled>()) {
+            view.onZoom(mouseWheelScroll->delta);
         }
     }
 }

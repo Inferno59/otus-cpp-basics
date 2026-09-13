@@ -25,6 +25,17 @@ class Velocity {
         return vec;
     }
 
+    inline friend Velocity operator/(const Velocity& p, double scalar) {
+        return {p.vec / scalar};
+    }
+    
   private:
     Point vec;
 };
+
+inline std::istream& operator>>(std::istream& os, Velocity& velocity) {
+    Point buf_point;
+    os >> buf_point.x >> buf_point.y;
+    velocity.setVector(buf_point);
+    return os;
+}

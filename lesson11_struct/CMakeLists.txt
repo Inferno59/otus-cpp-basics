@@ -4,7 +4,7 @@ project(physics)
 set(CMAKE_CXX_STANDARD 17)
 
 # Пытаемся найти предустановленный SFML
-find_package(SFML COMPONENTS graphics)
+find_package(SFML COMPONENTS System Window Graphics REQUIRED)
 
 if (SFML_FOUND)
     message(STATUS "The SFML installed in the system will be used")
@@ -32,9 +32,10 @@ if (MSVC)
 endif ()
 
 add_executable(physics
-        main.cpp World.cpp Ball.cpp Physics.cpp Color.cpp Painter.cpp
-        black_box/Application.cpp black_box/View.cpp black_box/PainterImpl.cpp)
-target_link_libraries(physics PRIVATE sfml-graphics)
+       main.cpp World.cpp Ball.cpp Physics.cpp Color.cpp Painter.cpp Dust.cpp
+       black_box/Application.cpp black_box/View.cpp black_box/PainterImpl.cpp)
+
+target_link_libraries(physics PRIVATE sfml-system sfml-window sfml-graphics)
 
 target_compile_options(physics PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/W4>

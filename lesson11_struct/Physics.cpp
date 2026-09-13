@@ -39,36 +39,22 @@ void Physics::collideBalls(std::vector<Ball>& balls) const {
 
 void Physics::collideWithBox(std::vector<Ball>& balls) const {
     for (Ball& ball : balls) {
-        Point p = ball.getCenter();
+        const Point p = ball.getCenter();
         const double r = ball.getRadius();
-        Point v = ball.getVelocity().vector();
+        // определяет, находится ли v в диапазоне (lo, hi) (не включая границы)
+        auto isOutOfRange = [](double v, double lo, double hi) {
+            return v < lo || v > hi;
+        };
 
-        bool wasX = false, wasY = false;
-
-        if (p.x - r < topLeft.x) {
-            p.x = topLeft.x + r;
-            wasX = true;
-        } else if (p.x + r > bottomRight.x) {
-            p.x = bottomRight.x - r;
-            wasX = true;
+        if (isOutOfRange(p.x, topLeft.x + r, bottomRight.x - r)) {
+            Point vector = ball.getVelocity().vector();
+            vector.x = -vector.x;
+            ball.setVelocity(vector);
+        } else if (isOutOfRange(p.y, topLeft.y + r, bottomRight.y - r)) {
+            Point vector = ball.getVelocity().vector();
+            vector.y = -vector.y;
+            ball.setVelocity(vector);
         }
-
-        if (p.y - r < topLeft.y) {
-            p.y = topLeft.y + r;
-            wasY = true;
-        } else if (p.y + r > bottomRight.y) {
-            p.y = bottomRight.y - r;
-            wasY = true;
-        }
-
-        // Только если шар сталкиваемый — меняем скорость
-        if (ball.isCollibadle()) {
-            if (wasX) v.x = -v.x;
-            if (wasY) v.y = -v.y;
-        }
-
-        ball.setCenter(p);
-        ball.setVelocity(v);
     }
 }
 
@@ -90,11 +76,17 @@ void Physics::processCollision(Ball& a, Ball& b,
     const Point aV = a.getVelocity().vector();
     const Point bV = b.getVelocity().vector();
 
+    // Эффективные массы: "призрак" не оказывает сопротивления
+    double a_mass = a.isCollibadle() ? a.getMass() : 0.0;
+    double b_mass = b.isCollibadle() ? b.getMass() : 0.0;
+
     // коэффициент p учитывает скорость обоих мячей
+    // Деления на ноль не будет, т.к. в collideBalls мы попадаем сюда
+    // только если хотя бы один шар isCollidable == true    
     const double p =
-        2 * (dot(aV, normal) - dot(bV, normal)) / (a.getMass() + b.getMass());
+        2 * (dot(aV, normal) - dot(bV, normal)) / (a_mass + b_mass);
 
     // задаем новые скорости мячей после столкновения
-    a.setVelocity(Velocity(aV - normal * p * b.getMass()));
-    b.setVelocity(Velocity(bV + normal * p * a.getMass()));
+    a.setVelocity(Velocity(aV - normal * p * a_mass));
+    b.setVelocity(Velocity(bV + normal * p * b_mass));    
 }

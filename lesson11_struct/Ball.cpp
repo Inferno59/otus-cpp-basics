@@ -73,7 +73,7 @@ double Ball::getRadius() const {
 double Ball::getMass() const {
     // TODO: место для доработки
     double volume = 3.14 * std::pow(radius_, 3) * 4. / 3.;
-    return isCollidable_ ? 0 : volume;
+    return volume;
 }
 
 bool Ball::isCollibadle() const {

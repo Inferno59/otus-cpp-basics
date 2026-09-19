@@ -7,7 +7,7 @@ namespace my_containers{
     , max_size_{kDefaultSize}
     , data{nullptr} {
       // Резервируем стартовое пространство
-      resize(max_size_);      
+      reserved(max_size_);      
     }
 
   template <typename T>
@@ -17,7 +17,7 @@ namespace my_containers{
     , data{nullptr} {
 
       // Резервируем стартовое пространство
-      resize(max_size_);
+      reserved(max_size_);
       push_back(value);
     }
 
@@ -26,7 +26,7 @@ namespace my_containers{
     : size_{}
     , max_size_{get_max_size(size)}
     , data{nullptr} {
-      resize(max_size_); 
+      reserved(max_size_); 
       for(size_t i = 0; i < size; ++i) {
         push_back(value);
       }
@@ -39,11 +39,17 @@ namespace my_containers{
     , max_size_{get_max_size(values.size())}
     , data{nullptr} {
 
-      resize(max_size_); 
+      reserved(max_size_); 
 
       for(auto& value : values)
         push_back(value);
     }    
+    
+  template <typename T>
+  Vector<T>::~Vector() {
+    clear();
+    operator delete(data);
+  }
     
   template <typename T>
   std::size_t Vector<T>::size() const {
@@ -53,7 +59,7 @@ namespace my_containers{
   template <typename T>
   std::size_t Vector<T>::max_size() const {
     return max_size_;
-  }  
+  }
 
   template <typename T>
   void Vector<T>::push_back(const T& value) {
@@ -62,13 +68,16 @@ namespace my_containers{
       resize(max_size_);
     }
 
-    std::cout << "push_back: " << size_ << std::endl;
-    data[size_++] = value;
+    new (&data[size_++]) T(value);
+  }
+
+  template <typename T>
+  void Vector<T>::reserved(size_t size) {
+    data = static_cast<T*>(operator new(sizeof(T) * size));
   }
 
   template <typename T>
   void Vector<T>::resize(size_t size) {
-    std::cout << "resize: " << size << std::endl;
     T* new_data = new T[size];
     if (data) {
       for(size_t i = 0; i < size_; ++i)
@@ -77,11 +86,55 @@ namespace my_containers{
       delete [] data;
     }
 
-    data = new_data;
-  }
+    data = new_data;  
+  }  
 
   template <typename T>
   void Vector<T>::erase(size_t pos) {
+    if (size_ == 0 || pos > size_)
+      return;
 
+    const size_t internal_pos = pos > 0 ? pos - 1 : 0;
+    data[internal_pos].~T(); // Вызываем деструктор удаляемого объекта
+
+    // Сдвигаем массив на позицию влево
+    for (size_t i = internal_pos; i < size_ - 1; ++i)
+      data[i] = data[i + 1];
+
+    data[size_ - 1].~T(); // Вызываем деструктор последнего объекта, чтоб не двоился
+    --size_;
+  }
+
+  template <typename T>
+  void Vector<T>::insert(size_t pos, const T& value) {
+    const int internal_pos = pos > 0 ? pos - 1 : 0;
+
+    if (size_ + 1  > max_size_ - 1) {
+      max_size_ *= 2.0;
+      resize(max_size_);
+    }
+
+    // Сдвигаем массив на позицию вправо
+    for (int i = size_ - 1; i >= internal_pos; --i)
+      data[i + 1] = data[i];
+
+    data[internal_pos] = value;
+    ++size_;
+  }
+
+  template <typename T>
+  void Vector<T>::clear() {
+    for(size_t i = 0; i < size_; ++i) {
+      data[i].~T();
+    }
+    size_ = 0;
+  }
+
+  template <typename T>
+  void Vector<T>::pop_back() {
+    if (size_ == 0)
+      return;
+
+    data[size_ - 1].~T();
   }
 }

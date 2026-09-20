@@ -5,7 +5,7 @@ namespace my_containers{
   Vector<T>::Vector()
     : size_{}
     , max_size_{kDefaultSize}
-    , data{nullptr} {
+    , data_{nullptr} {
       // Резервируем стартовое пространство
       reserved(max_size_);      
     }
@@ -14,7 +14,7 @@ namespace my_containers{
   Vector<T>::Vector(const T& value)
     : size_{}
     , max_size_{kDefaultSize}
-    , data{nullptr} {
+    , data_{nullptr} {
 
       // Резервируем стартовое пространство
       reserved(max_size_);
@@ -25,19 +25,18 @@ namespace my_containers{
   Vector<T>::Vector(const T& value, size_t size)
     : size_{}
     , max_size_{get_max_size(size)}
-    , data{nullptr} {
+    , data_{nullptr} {
       reserved(max_size_); 
       for(size_t i = 0; i < size; ++i) {
         push_back(value);
       }
-        
     }
     
     template <typename T>
     Vector<T>::Vector(std::initializer_list<T> values) 
     : size_{}
     , max_size_{get_max_size(values.size())}
-    , data{nullptr} {
+    , data_{nullptr} {
 
       reserved(max_size_); 
 
@@ -48,7 +47,6 @@ namespace my_containers{
   template <typename T>
   Vector<T>::~Vector() {
     clear();
-    operator delete(data);
   }
     
   template <typename T>
@@ -68,26 +66,56 @@ namespace my_containers{
       resize(max_size_);
     }
 
-    new (&data[size_++]) T(value);
+    new (&data_[size_++]) T(value);
   }
 
   template <typename T>
   void Vector<T>::reserved(size_t size) {
-    data = static_cast<T*>(operator new(sizeof(T) * size));
+    if (max_size_ < size)
+      max_size_ = size;
+
+    data_ = allocate(max_size_);
   }
 
   template <typename T>
+  T* Vector<T>::allocate(size_t size) {
+    return static_cast<T*>(operator new(sizeof(T) * size));
+  }
+  
+  template <typename T>
   void Vector<T>::resize(size_t size) {
-    T* new_data = new T[size];
-    if (data) {
+    T* new_data = allocate(size);
+    if (data_) {
       for(size_t i = 0; i < size_; ++i)
-        new_data[i] = data[i];
+        new_data[i] = data_[i];
 
-      delete [] data;
+      clear_internal_memory();
     }
 
-    data = new_data;  
+    data_ = new_data;  
+    max_size_ = size;
   }  
+
+  template <typename T>
+  typename Vector<T>::iterator Vector<T>::erase(iterator& pos) {
+    // Защита от невалидных итераторов
+    if (pos < begin() || pos > end())
+        throw std::out_of_range("Iterator out of bounds");
+
+    size_t insert_idx = static_cast<size_t>(pos - begin());
+
+    // Получаем указатель на объект и вызываем у него деструктор
+    T* target = pos.get();
+    target->~T();
+
+    shift_to_left_from_idx(insert_idx);
+
+    // Вызываем деструктор последнего элемента
+    end().get()->~T();
+
+    --size_;
+    return iterator(target);
+  }
 
   template <typename T>
   void Vector<T>::erase(size_t pos) {
@@ -95,39 +123,101 @@ namespace my_containers{
       return;
 
     const size_t internal_pos = pos > 0 ? pos - 1 : 0;
-    data[internal_pos].~T(); // Вызываем деструктор удаляемого объекта
+    data_[internal_pos].~T(); // Вызываем деструктор удаляемого объекта
 
-    // Сдвигаем массив на позицию влево
-    for (size_t i = internal_pos; i < size_ - 1; ++i)
-      data[i] = data[i + 1];
+    shift_to_left_from_idx(internal_pos);
 
-    data[size_ - 1].~T(); // Вызываем деструктор последнего объекта, чтоб не двоился
+    data_[size_ - 1].~T(); // Вызываем деструктор последнего объекта, чтоб не двоился
     --size_;
   }
 
   template <typename T>
-  void Vector<T>::insert(size_t pos, const T& value) {
-    const int internal_pos = pos > 0 ? pos - 1 : 0;
+  void Vector<T>::shift_to_left_from_idx(int idx) {
+    for (size_t i = idx; i < size_ - 1; ++i)
+      data_[i] = data_[i + 1];
+  }
 
-    if (size_ + 1  > max_size_ - 1) {
-      max_size_ *= 2.0;
-      resize(max_size_);
+  template <typename T>
+  typename Vector<T>::iterator Vector<T>::insert(iterator& pos, const T& value) {
+    // Защита от невалидных итераторов
+    if (pos < begin() || pos > end())
+        throw std::out_of_range("Iterator out of bounds");
+
+    size_t insert_idx = static_cast<size_t>(pos - begin());
+
+    if (size_ + 1  > max_size_) {
+      const size_t tmp_max_size_ = max_size_ * 2;
+      T* new_data = allocate(tmp_max_size_);
+
+      // Копируем элементы ДО позиции вставки
+      for (size_t i = 0; i < insert_idx; ++i)
+        new (&new_data[i]) T(data_[i]);
+
+      new (&new_data[insert_idx]) T(value);
+
+      // Копируем элементы ПОСЛЕ позиции вставки
+      for (size_t i = insert_idx; i < size_; ++i)
+        new (&new_data[i + 1]) T(data_[i]);
+
+      clear_internal_memory();
+
+      data_ = new_data;
+      max_size_ = tmp_max_size_;
+    } else {
+      shift_to_right_from_idx(insert_idx);
+      new (&data_[insert_idx]) T(value);
     }
 
-    // Сдвигаем массив на позицию вправо
-    for (int i = size_ - 1; i >= internal_pos; --i)
-      data[i + 1] = data[i];
+    ++size_;   
+    
+    return iterator(&data_[insert_idx]);
+  }
 
-    data[internal_pos] = value;
+  template <typename T>
+  void Vector<T>::insert(size_t pos, const T& value) {
+    const int insert_idx = pos > 0 ? pos - 1 : 0;
+
+    if (size_ + 1  > max_size_) {
+      const size_t tmp_max_size_ = max_size_ * 2;
+      T* new_data = allocate(tmp_max_size_);
+
+      // Копируем элементы ДО позиции вставки
+      for (size_t i = 0; i < insert_idx; ++i)
+        new (&new_data[i]) T(data_[i]);
+
+      new (&new_data[insert_idx]) T(value);
+
+      // Копируем элементы ПОСЛЕ позиции вставки
+      for (size_t i = insert_idx; i < size_; ++i)
+        new (&new_data[i + 1]) T(data_[i]);
+
+      clear_internal_memory();
+
+      data_ = new_data;      
+      max_size_ = tmp_max_size_;
+    } else {
+      shift_to_right_from_idx(insert_idx);
+      new (&data_[insert_idx]) T(value);
+    }
+
     ++size_;
   }
 
   template <typename T>
-  void Vector<T>::clear() {
-    for(size_t i = 0; i < size_; ++i) {
-      data[i].~T();
+  void Vector<T>::shift_to_right_from_idx(int idx) {
+    if (size_ > 0) {
+      for (int i = size_ - 1; i >= idx; --i) {
+        data_[i + 1] = data_[i];
+      }
+        
     }
+  }
+
+  template <typename T>
+  void Vector<T>::clear() {
+    clear_internal_memory();
     size_ = 0;
+    max_size_ = 0;
   }
 
   template <typename T>
@@ -135,6 +225,75 @@ namespace my_containers{
     if (size_ == 0)
       return;
 
-    data[size_ - 1].~T();
+    data_[size_ - 1].~T();
+  }
+
+  template <typename T>
+  void Vector<T>::clear_internal_memory() {
+    if (data_ == nullptr)
+      return;
+
+    for(size_t i = 0; i < size_; ++i) {
+      data_[i].~T();
+    }
+    operator delete(data_);
+  }
+
+
+  template <typename T>
+  Vector<T>::Vector(const Vector<T>& src) 
+    : size_{src.size()}
+    , max_size_{src.max_size()}
+    , data_{allocate(max_size_)} {
+
+    for (size_t i = 0; i < size_; ++i)
+      new (&data_[i]) T(src[i]);
+
+    std::cout << "Copy ctor" << std::endl;
+  }
+
+  template <typename T>
+  Vector<T>::Vector(Vector<T>&& src)
+    : size_{src.size()}
+    , max_size_{src.max_size()}
+    , data_{src.data_} {
+
+    src.data_ = nullptr;
+    src.size_ = 0;
+    src.max_size_ = 0;
+
+    std::cout << "Move ctor" << std::endl;
+  }
+
+  template <typename T>
+  Vector<T>& Vector<T>::operator=(const Vector<T>& src) {
+    T* new_data = allocate(src.max_size());
+
+    for (size_t i = 0; i < src.size(); ++i)
+      new (&new_data[i]) T(src.data_[i]);    
+
+    clear();
+
+    size_ = src.size();
+    max_size_ = src.max_size();
+    data_ = new_data;
+
+    std::cout << "Copy operator" << std::endl;
+
+    return *this;
+  }
+  template <typename T>
+  Vector<T>& Vector<T>::operator=(Vector<T>&& src) {
+    clear();
+    data_ = src.data_;
+    size_ = src.size_;
+    max_size_ = src.max_size_;
+
+    src.data_ = nullptr;
+    src.size_ = 0;
+    src.max_size_ = 0;
+
+    std::cout << "Move operator" << std::endl;
+    return *this;
   }
 }

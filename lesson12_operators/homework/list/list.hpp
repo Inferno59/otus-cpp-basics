@@ -10,16 +10,14 @@ namespace my_containers {
   struct Node {
     Node* next;
     Node* prev;
-    T* data;
+    T data;
 
-    Node(const T* value) 
+    Node(const T value) 
       : next{nullptr}
       , prev{nullptr}
       , data{value} {}
 
-    ~Node() {
-      delete data;
-    }
+    ~Node() {}
   };
   
   template <typename T>
@@ -89,23 +87,33 @@ namespace my_containers {
       explicit List(const T& value, size_t size);
       explicit List(std::initializer_list<T> values);
 
-      ~List();
+      ~List() {clear();}
       List(const List<T>& src);
       List(List<T>&& src);
 
       List<T>& operator=(const List<T>& src);
       List<T>& operator=(List<T>&& src);
     
+      void clear();
+
       void push_back(const T& value);
-      Iterator insert(Iterator pos, const T& value);
-      Iterator erase(Iterator pos);
+      void push_front(const T& value);
+
+      using iterator = list_iterator<T>;
+      iterator begin();
+      iterator end();
+
+      iterator insert(iterator pos, const T& value);
+      iterator erase(iterator pos);
 
       std::size_t size() const { return size_; }
+      bool empty() const { return size_ == 0; }
 
       // Тут надо реализовать перебор по указателю, пока не достигнешь нужного, по счету, у настоящего листа нет такого
       T* operator[](const size_t idx) { return T{}; }
     private:
-      std::size_t size_;
-      Node<T>* node_;
+      Node<T>* head_;
+      Node<T>* tail_;
+      size_t size_;
   };
 }

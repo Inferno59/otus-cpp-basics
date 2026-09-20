@@ -3,7 +3,6 @@
 #include <cstdint> // std::types
 #include <initializer_list>
 #include <iostream>
-#include <vector>
 
 namespace  my_containers{
 
@@ -66,7 +65,7 @@ namespace  my_containers{
   template <typename T>
   class Vector {
     public:
-      explicit Vector();
+      Vector();
       explicit Vector(const T& value);
       explicit Vector(const T& value, size_t size);
       explicit Vector(std::initializer_list<T> values);

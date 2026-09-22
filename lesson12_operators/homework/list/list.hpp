@@ -82,12 +82,13 @@ namespace my_containers {
   template <typename T>
   class List {
     public:
-      explicit List();
+      List();
       explicit List(const T& value);
       explicit List(const T& value, size_t size);
       explicit List(std::initializer_list<T> values);
 
-      ~List() {clear();}
+      ~List() { clear(); }
+
       List(const List<T>& src);
       List(List<T>&& src);
 

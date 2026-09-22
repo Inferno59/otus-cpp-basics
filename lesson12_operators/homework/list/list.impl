@@ -1,6 +1,82 @@
-#include "list.hpp"
-
 namespace my_containers {  
+
+  template<typename T>
+  List<T>::List() 
+    : head_{nullptr}
+    , tail_{nullptr}
+    , size_{0} {}
+
+  template<typename T>
+  List<T>::List(const T& value) 
+    : head_{nullptr}
+    , tail_{nullptr}
+    , size_{0} {
+        push_back(value);
+    }
+
+  template<typename T>
+  List<T>::List(const T& value, size_t size)
+    : head_{nullptr}
+    , tail_{nullptr}
+    , size_{0} {
+        for (size_t i = 0; i < size; ++i)
+            push_back(value);
+    }
+
+  template<typename T>
+  List<T>::List(std::initializer_list<T> values)
+    : head_{nullptr}
+    , tail_{nullptr}
+    , size_{0} {
+        for (const auto& value : values)
+            push_back(value);    
+  }
+
+  template <typename T>
+  List<T>::List(const List<T>& src) 
+    : head_(nullptr)
+    , tail_(nullptr)
+    , size_(0) {
+      for (Node<T>* curr = src.head_; curr != nullptr; curr = curr->next) {
+          push_back(curr->data);
+      }
+  }
+
+  template <typename T>
+  List<T>::List(List<T>&& src)
+    : head_(src.head_)
+    , tail_(src.tail_)
+    , size_(src.size_) {
+      src.head_ = nullptr;
+      src.tail_ = nullptr;
+      src.size_ = 0;
+  }
+  
+  template <typename T>
+  List<T>& List<T>::operator=(const List<T>& src) {
+      if (this != &src) {
+          List<T> temp(src);
+          std::swap(head_, temp.head_);
+          std::swap(tail_, temp.tail_);
+          std::swap(size_, temp.size_);
+      }
+      return *this;
+  }
+
+  template <typename T>
+  List<T>& List<T>::operator=(List<T>&& src) {
+      if (this != &src) {
+          clear();
+          head_ = src.head_;
+          tail_ = src.tail_;
+          size_ = src.size_;
+          
+          src.head_ = nullptr;
+          src.tail_ = nullptr;
+          src.size_ = 0;
+      }
+      return *this;
+  }
 
   template <typename T>
   void List<T>::clear() {

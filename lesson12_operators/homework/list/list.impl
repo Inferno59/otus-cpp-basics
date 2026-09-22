@@ -40,6 +40,7 @@ namespace my_containers {
       for (Node<T>* curr = src.head_; curr != nullptr; curr = curr->next) {
           push_back(curr->data);
       }
+      std::cout << "Copy list ctor" << std::endl;
   }
 
   template <typename T>
@@ -50,6 +51,8 @@ namespace my_containers {
       src.head_ = nullptr;
       src.tail_ = nullptr;
       src.size_ = 0;
+
+      std::cout << "Move list ctor" << std::endl;
   }
   
   template <typename T>
@@ -60,6 +63,7 @@ namespace my_containers {
           std::swap(tail_, temp.tail_);
           std::swap(size_, temp.size_);
       }
+      std::cout << "Copy list operator" << std::endl;
       return *this;
   }
 
@@ -75,6 +79,8 @@ namespace my_containers {
           src.tail_ = nullptr;
           src.size_ = 0;
       }
+
+      std::cout << "Move list operator" << std::endl;
       return *this;
   }
 
@@ -129,7 +135,7 @@ namespace my_containers {
   template <typename T>
   typename List<T>::iterator List<T>::insert(iterator pos, const T& value) {
       Node<T>* new_node = new Node<T>(value);
-      Node<T>* current = pos.get_node();  // Нода, перед которой вставляем
+      Node<T>* current = pos.get();  // Нода, перед которой вставляем
 
       // Вставка в пустой список или в конец (pos == end())
       if (current == nullptr) {
@@ -165,7 +171,7 @@ namespace my_containers {
       if (pos == end())
           throw std::out_of_range("Cannot erase end() iterator");
 
-      Node<T>* current = pos.get_node();
+      Node<T>* current = pos.get();
       Node<T>* prev_node = current->prev;
       Node<T>* next_node = current->next;
 

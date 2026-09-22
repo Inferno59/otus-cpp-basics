@@ -110,11 +110,37 @@ namespace my_containers {
       std::size_t size() const { return size_; }
       bool empty() const { return size_ == 0; }
 
-      // Тут надо реализовать перебор по указателю, пока не достигнешь нужного, по счету, у настоящего листа нет такого
-      T* operator[](const size_t idx) { return T{}; }
+      T* operator[](const size_t idx) {
+          if (idx >= size_)
+              return nullptr;
+
+          Node<T>* curr = head_;
+          for (size_t i = 0; i < idx; ++i)
+              curr = curr->next;
+
+          return &(curr->data);
+      }
+
+      friend std::ostream& operator<<(std::ostream& os, const List<T>& src) {
+        const size_t kListSize = src.size();
+
+        Node<T>* curr = src.head_;
+        size_t idx = 0;
+        while(curr) {
+          os << curr->data;
+          if ((idx + 1) < kListSize)
+            os << ", ";
+          curr = curr->next;
+          ++idx;
+        }
+
+        return os;
+      }      
     private:
       Node<T>* head_;
       Node<T>* tail_;
       size_t size_;
   };
 }
+
+#include "list.impl"

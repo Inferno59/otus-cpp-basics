@@ -247,7 +247,7 @@ namespace my_containers{
     for (size_t i = 0; i < size_; ++i)
       new (&data_[i]) T(src[i]);
 
-    std::cout << "Copy ctor" << std::endl;
+    std::cout << "Copy vector ctor" << std::endl;
   }
 
   template <typename T>
@@ -260,7 +260,7 @@ namespace my_containers{
     src.size_ = 0;
     src.max_size_ = 0;
 
-    std::cout << "Move ctor" << std::endl;
+    std::cout << "Move vector ctor" << std::endl;
   }
 
   template <typename T>
@@ -276,7 +276,7 @@ namespace my_containers{
     max_size_ = src.max_size();
     data_ = new_data;
 
-    std::cout << "Copy operator" << std::endl;
+    std::cout << "Copy vector operator" << std::endl;
 
     return *this;
   }
@@ -291,7 +291,7 @@ namespace my_containers{
     src.size_ = 0;
     src.max_size_ = 0;
 
-    std::cout << "Move operator" << std::endl;
+    std::cout << "Move vector operator" << std::endl;
     return *this;
   }
 }

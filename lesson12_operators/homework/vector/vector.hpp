@@ -60,7 +60,7 @@ namespace  my_containers {
       }
       // -----------------------------------------------------
 
-      size_t operator-(const vector_iterator& b) const {
+      difference_type operator-(const vector_iterator& b) const {
         return ptr - b.ptr;
       }
 

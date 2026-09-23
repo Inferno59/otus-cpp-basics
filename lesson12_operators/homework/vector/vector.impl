@@ -65,7 +65,7 @@ namespace my_containers {
       resize(max_size_);
     }
 
-    new (&data_[size_++]) T(std::move(value));
+    new (&data_[size_++]) T(value);
   }
 
   template <typename T>
@@ -86,7 +86,7 @@ namespace my_containers {
   
   template <typename T>
   void Vector<T>::resize(size_t size) {
-    if (size_ > size_)
+    if (size_ > size)
       throw std::out_of_range("Cannot shrink of vector");
 
     T* new_data = allocate(size);
@@ -154,7 +154,7 @@ namespace my_containers {
       for (size_t i = 0; i < pos; ++i)
         new (&new_data[i]) T(std::move(data_[i]));
 
-      new (&new_data[pos]) T(std::move(value));
+      new (&new_data[pos]) T(value);
 
       // Копируем элементы ПОСЛЕ позиции вставки
       for (size_t i = pos; i < size_; ++i)
@@ -168,7 +168,7 @@ namespace my_containers {
       // Делаем смещение обьектов вправо
       shift_to_right_from_idx(pos);
       data_[pos].~T(); // Уничтожаем старый объект
-      new (&data_[pos]) T(std::move(value));
+      new (&data_[pos]) T(value);
     }
 
     ++size_;
@@ -224,7 +224,7 @@ namespace my_containers {
     , data_{allocate(max_size_)} {
 
     for (size_t i = 0; i < size_; ++i)
-      new (&data_[i]) T(std::move(src[i]));
+      new (&data_[i]) T(src[i]);
 
     std::cout << "Copy vector ctor" << std::endl;
   }
@@ -250,7 +250,7 @@ namespace my_containers {
     T* new_data = allocate(src.max_size());
 
     for (size_t i = 0; i < src.size(); ++i)
-      new (&new_data[i]) T(std::move(src.data_[i]));    
+      new (&new_data[i]) T(src.data_[i]);    
 
     clear();
 

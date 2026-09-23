@@ -54,7 +54,7 @@ namespace  my_containers {
         return vector_iterator(ptr - n);
       }
       
-      vector_iterator operator-=(difference_type n) {
+      vector_iterator& operator-=(difference_type n) {
           ptr -= n;
           return *this;
       }

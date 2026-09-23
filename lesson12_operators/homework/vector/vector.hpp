@@ -4,13 +4,13 @@
 #include <initializer_list>
 #include <iostream>
 
-namespace  my_containers{
+namespace  my_containers {
 
   template <typename T>
   class vector_iterator {
   public:
       // === Обязательные typedef для совместимости с STL ===
-      using iterator_category = std::forward_iterator_tag; // Категория итератора
+      using iterator_category = std::random_access_iterator_tag; // Категория итератора
       using value_type        = T;
       using difference_type   = std::ptrdiff_t;
       using pointer           = T*;
@@ -39,6 +39,26 @@ namespace  my_containers{
           ++(*this); // Вызываем префиксный инкремент
           return tmp;
       }
+
+      // Перегрузка +/-/+=/-= ------------------------------
+      vector_iterator operator+(difference_type n) {
+        return vector_iterator(ptr + n);
+      }
+      
+      vector_iterator& operator+=(difference_type n) {
+          ptr += n;
+          return *this;
+      }
+      
+      vector_iterator operator-(difference_type n) {
+        return vector_iterator(ptr - n);
+      }
+      
+      vector_iterator operator-=(difference_type n) {
+          ptr -= n;
+          return *this;
+      }
+      // -----------------------------------------------------
 
       size_t operator-(const vector_iterator& b) const {
         return ptr - b.ptr;
@@ -96,19 +116,19 @@ namespace  my_containers{
       iterator begin() { return iterator{data_}; }
       iterator end() {return iterator{data_ + size_}; };
 
-      T& operator[](const T pos) {
+      T& operator[](const size_t pos) {
         return data_[pos];
       }
 
-      const T& operator[](const T pos) const {
+      const T& operator[](const size_t pos) const {
         return data_[pos];
       }      
     private:
       static constexpr uint16_t kDefaultSize = 10;
       static constexpr uint16_t kDefaultFactor = 2;
 
-      void shift_to_right_from_idx(int idx);
-      void shift_to_left_from_idx(int idx);
+      void shift_to_right_from_idx(size_t idx);
+      void shift_to_left_from_idx(size_t idx);
 
       void clear_internal_memory();
       T* allocate(size_t size);

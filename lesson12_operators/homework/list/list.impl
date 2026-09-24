@@ -1,0 +1,202 @@
+namespace my_containers {  
+
+  template<typename T>
+  List<T>::List() 
+    : head_{nullptr}
+    , tail_{nullptr}
+    , size_{0} {}
+
+  template<typename T>
+  List<T>::List(const T& value) 
+    : head_{nullptr}
+    , tail_{nullptr}
+    , size_{0} {
+        push_back(value);
+    }
+
+  template<typename T>
+  List<T>::List(const T& value, size_t size)
+    : head_{nullptr}
+    , tail_{nullptr}
+    , size_{0} {
+        for (size_t i = 0; i < size; ++i)
+            push_back(value);
+    }
+
+  template<typename T>
+  List<T>::List(std::initializer_list<T> values)
+    : head_{nullptr}
+    , tail_{nullptr}
+    , size_{0} {
+        for (const auto& value : values)
+            push_back(value);    
+  }
+
+  template <typename T>
+  List<T>::List(const List<T>& src) 
+    : head_(nullptr)
+    , tail_(nullptr)
+    , size_(0) {
+      for (Node<T>* curr = src.head_; curr != nullptr; curr = curr->next) {
+          push_back(curr->data);
+      }
+      std::cout << "Copy list ctor" << std::endl;
+  }
+
+  template <typename T>
+  List<T>::List(List<T>&& src)
+    : head_(src.head_)
+    , tail_(src.tail_)
+    , size_(src.size_) {
+      src.head_ = nullptr;
+      src.tail_ = nullptr;
+      src.size_ = 0;
+
+      std::cout << "Move list ctor" << std::endl;
+  }
+  
+  template <typename T>
+  List<T>& List<T>::operator=(const List<T>& src) {
+      if (this != &src) {
+          List<T> temp(src);
+          std::swap(head_, temp.head_);
+          std::swap(tail_, temp.tail_);
+          std::swap(size_, temp.size_);
+      }
+      std::cout << "Copy list operator" << std::endl;
+      return *this;
+  }
+
+  template <typename T>
+  List<T>& List<T>::operator=(List<T>&& src) {
+      if (this != &src) {
+          clear();
+          head_ = src.head_;
+          tail_ = src.tail_;
+          size_ = src.size_;
+          
+          src.head_ = nullptr;
+          src.tail_ = nullptr;
+          src.size_ = 0;
+      }
+
+      std::cout << "Move list operator" << std::endl;
+      return *this;
+  }
+
+  template <typename T>
+  void List<T>::clear() {
+    Node<T>* current = head_;
+    while (current) {
+        Node<T>* next = current->next;
+        delete current;
+        current = next;
+    }
+    head_ = tail_ = nullptr;
+    size_ = 0;
+  }
+  
+  template <typename T>
+  void List<T>::push_back(const T& value) {
+    Node<T>* new_node = new Node<T>(value);
+    if (!tail_) {
+      head_ = tail_ = new_node;  
+    } else {
+      tail_->next = new_node;
+      new_node->prev = tail_;
+      tail_ = new_node;      
+    }
+    ++size_;
+  }
+
+  template <typename T>
+  void List<T>::push_front(const T& value) {
+    Node<T>* new_node = new Node<T>(value);
+    if (!head_) {
+      head_ = tail_ = new_node;  
+    } else {
+      new_node->next = head_;
+      head_->prev = new_node;
+      head_ = new_node;      
+    }
+    ++size_;
+  }  
+
+  template <typename T>
+  typename List<T>::iterator List<T>::begin() {
+      return iterator(head_);
+  }
+
+  template <typename T>
+  typename List<T>::iterator List<T>::end() {
+      return iterator(nullptr);  // end() указывает за последний элемент
+  } 
+
+  template <typename T>
+  typename List<T>::iterator List<T>::insert(iterator pos, const T& value) {
+      Node<T>* new_node = new Node<T>(value);
+      Node<T>* current = pos.get();  // Нода, перед которой вставляем
+
+      // Вставка в пустой список или в конец (pos == end())
+      if (current == nullptr) {
+          if (tail_ == nullptr) {
+              // Список пуст — новый элемент становится и головой, и хвостом
+              head_ = tail_ = new_node;
+          } else {
+              // Вставка в конец
+              tail_->next = new_node;
+              new_node->prev = tail_;
+              tail_ = new_node;
+          }
+      } else if (current == head_) { // Вставка в начало (pos == begin())
+          new_node->next = head_;
+          head_->prev = new_node;
+          head_ = new_node;
+      } else { // Вставка в середину
+          Node<T>* prev_node = current->prev;
+
+          prev_node->next = new_node;
+          new_node->prev = prev_node;
+
+          new_node->next = current;
+          current->prev = new_node;
+      }
+
+      ++size_;
+      return iterator(new_node);
+  }
+
+  template <typename T>
+  typename List<T>::iterator List<T>::erase(iterator pos) {
+      if (pos == end())
+          throw std::out_of_range("Cannot erase end() iterator");
+
+      Node<T>* current = pos.get();
+      Node<T>* prev_node = current->prev;
+      Node<T>* next_node = current->next;
+
+      // Перенаправляем указатели соседей
+      if (prev_node != nullptr) {
+          prev_node->next = next_node;
+      } else {
+          // Удаляемый элемент был головой
+          head_ = next_node;
+      }
+
+      if (next_node != nullptr) {
+          next_node->prev = prev_node;
+      } else {
+          // Удаляемый элемент был хвостом
+          tail_ = prev_node;
+      }
+
+      // Сохраняем итератор на следующий элемент до удаления
+      iterator result(next_node);
+
+      // Освобождаем память
+      delete current;
+      --size_;
+
+      return result;
+  }
+}

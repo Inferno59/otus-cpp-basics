@@ -10,7 +10,6 @@ class Mean : public IStatistics {
 public:
   Mean()
     : mean_{0.0}
-    , sum_{0.0}
     , cnt_{0} {}
 
   virtual ~Mean() = default;
@@ -18,11 +17,14 @@ public:
   // IStatistics
 	virtual void update(double next) override {
     ++cnt_;
-    // Алгоритм Вельфорда: численно устойчивый расчет среднего
+    // Алгоритм Вильфорда: численно устойчивый расчет среднего
     mean_ += (next - mean_) / static_cast<double>(cnt_);
   }
 
 	double eval() const override {
+    if (cnt_ == 0)
+      return std::numeric_limits<double>::quiet_NaN();
+    
     return mean_;
   }
 
@@ -38,7 +40,6 @@ private:
   Mean& operator=(Mean&& src) = delete;
 
   double mean_;
-  double sum_;
   std::size_t cnt_;
 };
 

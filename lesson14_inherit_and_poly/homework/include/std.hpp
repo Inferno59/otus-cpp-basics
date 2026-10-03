@@ -20,14 +20,17 @@ public:
 	virtual void update(double next) override {
     ++cnt_;
 
-    double delta = next - mean_.eval();
+    double prev_mean = mean_.eval();
     mean_.update(next);
+
+    // Вычисляем дельты для алгоритма Вильфорда
+    double delta = next - prev_mean;
     double delta2 = next - mean_.eval();
     m2_ += delta * delta2;
 
     std_ = (cnt_ > 1) 
         ? std::sqrt(m2_ / (cnt_ - 1)) 
-        : 0.0;
+        : std_ = std::numeric_limits<double>::quiet_NaN(); ;
   }
 
 	double eval() const override {

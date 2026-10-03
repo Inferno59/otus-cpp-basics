@@ -7,6 +7,7 @@
 #include "min.hpp"
 #include "max.hpp"
 #include "mean.hpp"
+#include "std.hpp"
 
 namespace statistics {
 
@@ -17,6 +18,7 @@ public:
       algorithms_[0] = std::make_unique<Min>();
       algorithms_[1] = std::make_unique<Max>();
       algorithms_[2] = std::make_unique<Mean>();
+      algorithms_[3] = std::make_unique<Std>();
   }
 
   ~Statistics() = default;
@@ -32,7 +34,7 @@ public:
   }
 
 private:
-  std::array<std::unique_ptr<IStatistics>, 3> algorithms_;
+  std::array<std::unique_ptr<IStatistics>, 4> algorithms_;
 };
 
 } // namespace statistics

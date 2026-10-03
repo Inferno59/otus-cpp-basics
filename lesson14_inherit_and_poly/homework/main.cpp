@@ -1,8 +1,6 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <cctype>
-#include <type_traits>
 
 #include "include/statistics.hpp"
 

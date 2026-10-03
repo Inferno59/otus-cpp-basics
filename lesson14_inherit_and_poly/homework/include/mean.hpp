@@ -17,8 +17,9 @@ public:
 
   // IStatistics
 	virtual void update(double next) override {
-    sum_ += next;    
-    mean_ = sum_ / cnt_++;
+    ++cnt_;
+    // Алгоритм Вельфорда: численно устойчивый расчет среднего
+    mean_ += (next - mean_) / static_cast<double>(cnt_);
   }
 
 	double eval() const override {

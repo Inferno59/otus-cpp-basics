@@ -22,9 +22,6 @@ public:
   }
 
 	double eval() const override {
-    if (cnt_ == 0)
-      return std::numeric_limits<double>::quiet_NaN();
-    
     return mean_;
   }
 

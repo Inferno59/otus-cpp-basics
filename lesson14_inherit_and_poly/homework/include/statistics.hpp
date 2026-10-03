@@ -8,6 +8,8 @@
 #include "max.hpp"
 #include "mean.hpp"
 #include "std.hpp"
+#include "pct90.hpp"
+#include "pct95.hpp"
 
 namespace statistics {
 
@@ -19,6 +21,8 @@ public:
       algorithms_[1] = std::make_unique<Max>();
       algorithms_[2] = std::make_unique<Mean>();
       algorithms_[3] = std::make_unique<Std>();
+      algorithms_[4] = std::make_unique<Pct90>();
+      algorithms_[5] = std::make_unique<Pct95>();
   }
 
   ~Statistics() = default;
@@ -34,7 +38,7 @@ public:
   }
 
 private:
-  std::array<std::unique_ptr<IStatistics>, 4> algorithms_;
+  std::array<std::unique_ptr<IStatistics>, 6> algorithms_;
 };
 
 } // namespace statistics

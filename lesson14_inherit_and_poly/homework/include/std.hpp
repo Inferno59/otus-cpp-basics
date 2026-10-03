@@ -30,7 +30,7 @@ public:
 
     std_ = (cnt_ > 1) 
         ? std::sqrt(m2_ / (cnt_ - 1)) 
-        : std_ = std::numeric_limits<double>::quiet_NaN(); ;
+        : 0.0;
   }
 
 	double eval() const override {

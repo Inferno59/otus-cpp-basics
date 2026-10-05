@@ -28,8 +28,8 @@ public:
     double delta2 = next - mean_.eval();
     m2_ += delta * delta2;
 
-    std_ = (cnt_ > 1) 
-        ? std::sqrt(m2_ / (cnt_ - 1)) 
+    std_ = (cnt_ > 0) 
+        ? std::sqrt(m2_ / cnt_) 
         : 0.0;
   }
 

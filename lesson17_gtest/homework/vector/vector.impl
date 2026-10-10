@@ -115,8 +115,10 @@ namespace my_containers {
 
   template <typename T>
   void Vector<T>::erase(size_t pos) {
-    if (size_ == 0 || pos > size_)
+    if (size_ == 0 || pos > size_) {
+      std::cout << "pos: " << pos << " size_: " << size_ << std::endl;
       throw std::out_of_range("Cannot erase. Position out of bounds");
+    }
 
     shift_to_left_from_idx(pos);
     data_[size_ - 1].~T(); // Вызываем деструктор последнего объекта, чтоб не двоился
@@ -167,7 +169,6 @@ namespace my_containers {
     } else {
       // Делаем смещение обьектов вправо
       shift_to_right_from_idx(pos);
-      data_[pos].~T(); // Уничтожаем старый объект
       new (&data_[pos]) T(value);
     }
 
@@ -213,6 +214,7 @@ namespace my_containers {
     for(size_t i = 0; i < size_; ++i) {
       data_[i].~T();
     }
+    std::cout << "clear_internal_memory delete data" << std::endl;
     operator delete(data_);
   }
 

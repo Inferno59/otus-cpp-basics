@@ -1,3 +1,5 @@
+#pragma once
+
 namespace my_containers {
 
   template <typename T>
@@ -117,7 +119,6 @@ namespace my_containers {
   void Vector<T>::erase(size_t pos) {
     if (size_ == 0 || pos > size_) {
       throw std::out_of_range("Cannot erase. Position out of bounds");
-    }
 
     shift_to_left_from_idx(pos);
     data_[size_ - 1].~T(); // Вызываем деструктор последнего объекта, чтоб не двоился

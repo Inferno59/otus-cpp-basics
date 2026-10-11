@@ -25,7 +25,7 @@ namespace my_containers {
     : size_{}
     , max_size_{get_max_size(size)}
     , data_{nullptr} {
-      reserved(max_size_); 
+      reserved(max_size_);
       for(size_t i = 0; i < size; ++i) {
         push_back(value);
       }
@@ -116,7 +116,6 @@ namespace my_containers {
   template <typename T>
   void Vector<T>::erase(size_t pos) {
     if (size_ == 0 || pos > size_) {
-      std::cout << "pos: " << pos << " size_: " << size_ << std::endl;
       throw std::out_of_range("Cannot erase. Position out of bounds");
     }
 
@@ -214,7 +213,6 @@ namespace my_containers {
     for(size_t i = 0; i < size_; ++i) {
       data_[i].~T();
     }
-    std::cout << "clear_internal_memory delete data" << std::endl;
     operator delete(data_);
   }
 

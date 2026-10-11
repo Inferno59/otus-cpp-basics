@@ -117,10 +117,16 @@ namespace  my_containers {
       iterator end() {return iterator{data_ + size_}; };
 
       T& operator[](const size_t pos) {
+        if (pos >= size_)
+          throw std::out_of_range("Out of range");
+
         return data_[pos];
       }
 
       const T& operator[](const size_t pos) const {
+        if (pos >= size_)
+          throw std::out_of_range("Out of range");
+        
         return data_[pos];
       }      
     private:

@@ -12,7 +12,7 @@ namespace my_containers {
     Node* prev;
     T data;
 
-    Node(const T value) 
+    Node(const T& value) 
       : next{nullptr}
       , prev{nullptr}
       , data{value} {}

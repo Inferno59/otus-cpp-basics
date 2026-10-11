@@ -117,7 +117,7 @@ namespace my_containers {
 
   template <typename T>
   void Vector<T>::erase(size_t pos) {
-    if (size_ == 0 || pos > size_) {
+    if (size_ == 0 || pos > size_)
       throw std::out_of_range("Cannot erase. Position out of bounds");
 
     shift_to_left_from_idx(pos);
